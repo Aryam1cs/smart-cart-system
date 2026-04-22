@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحقق - إعادة العربة الذكية</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f7f6; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 80%; max-width: 400px; margin: auto; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 90%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        button:hover { background-color: #45a049; }
+        
+        .cart-info { background-color: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 15px; color: #1565c0; font-weight: bold; }
+        
+        /* تصميم مربع كود الخصم */
+        .coupon-box {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px dashed #4CAF50;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            animation: fadeIn 1s;
+        }
+        .coupon-box p { margin: 0; font-size: 14px; color: #333; }
+        .coupon-box h3 { margin: 5px 0; color: #4CAF50; letter-spacing: 2px; font-size: 24px; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>تأكيد إرجاع العربة 🛒</h2>
+    
+    <div class="cart-info">
+        عربة رقم: <span id="displayCartId">جاري التحقق...</span>
+    </div>
+
+    <p>شكراً لتسوقك! أدخل الرمز الموجود في الفاتورة لتحصل على مكافأتك.</p>
+    
+    <form id="verifyForm">
+        <input type="hidden" id="cartId" value=""> 
+        <input type="text" id="otp" placeholder="أدخل رمز OTP من الفاتورة" required>
+        <input type="tel" id="phone" placeholder="أدخل رقم الجوال للتسجيل" required>
+        
+        <button type="submit">تأكيد ومتابعة</button>
+    </form>
+    
+    <p id="responseMessage" style="color: green; display: none; margin-top: 15px; font-weight: bold;"></p>
+    
+    <div id="couponBox" class="coupon-box">
+        <p>مكافأتك جاهزة! استخدم الكود التالي في تسوقك القادم:</p>
+        <h3>SMART2026</h3>
+    </div>
+</div>
+
+<script>
+    // --- الجزء الجديد: قراءة رقم العربة من الرابط (الباركود) ---
+    const urlParams = new URLSearchParams(window.location.search);
+    // لو الرابط فيه cart_id بياخذه، ولو مافيه بيكتب "غير معروف"
+    const cartIdFromURL = urlParams.get('cart_id') || 'غير معروف'; 
+    
+    // نحدث الواجهة بالرقم الجديد
+    document.getElementById('displayCartId').innerText = cartIdFromURL;
+    document.getElementById('cartId').value = cartIdFromURL;
+    // --------------------------------------------------------
+
+    document.getElementById('verifyForm').addEventListener('submit', function(e) {
+        e.preventDefault(); 
+        
+        document.getElementById('verifyForm').style.display = 'none';
+        
+        const msg = document.getElementById('responseMessage');
+        msg.style.display = 'block';
+        msg.innerText = "تم استلام طلبك للعربة رقم (" + cartIdFromURL + ")! سيتم إضافة النقاط فور وصولها.";
+        
+        document.getElementById('couponBox').style.display = 'block';
+        
+        confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { y: 0.6 },
+            colors: ['#4CAF50', '#FFC107', '#2196F3', '#FF5722']
+        });
+    });
+</script>
+
+</body>
+</html>
