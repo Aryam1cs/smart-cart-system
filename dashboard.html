@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>SmartCart | مركز العمليات</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .admin-only { display: none; } /* لمنع الوميض للموظفين العاديين */
+        
+        /* تنسيقات شبكة الداشبورد */
+        .top-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 20px; }
+        .middle-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .charts-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+        
+        /* تنسيق كروت المحطات */
+        .station-card { padding: 20px; border-radius: 15px; margin-bottom: 15px; background: #fafafa; border: 1px solid #eee; transition: 0.3s; }
+        .station-card.critical { background: rgba(233, 12, 0, 0.05); border: 2px solid var(--vivid-red); }
+        .station-card.normal { background: rgba(65, 139, 36, 0.05); border: 2px solid transparent; }
+        
+        @media (max-width: 1024px) {
+            .top-stats { grid-template-columns: repeat(2, 1fr); }
+            .middle-grid, .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="employee-layout">
+        <aside class="sidebar">
+            <div class="logo" style="display: flex; align-items: center; justify-content: center; background-color:#FCFAf5; padding: 40px 20px 20px 20px; margin: -40px -20px 30px -20px; border-bottom: 4px solid var(--forest-green); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                 <img src="images/Mada_logo.png" alt="شعار مدى" style="max-height: 95px; width: 85%; object-fit: contain;">
+                </div>
+            <ul class="sidebar-nav">
+                <li><a href="dashboard.html" class="active"><i class="fas fa-th-large"></i> لوحة القيادة</a></li>
+                <li><a href="analysis.html"><i class="fas fa-brain"></i> تحليلات الذكاء الاصطناعي</a></li>
+                <li><a href="heatmap.html"><i class="fas fa-map-marked-alt"></i> خريطة المواقف</a></li>
+                <li><a href="#" id="btnLogout" class="sidebar-logout"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="main-header" style="text-align: center; margin-bottom: 30px;">
+                <h1 style="color: var(--brunswick-green); font-size: 2.5rem;"> مركز العمليات (Operations)</h1>
+                <p style="color: #666; font-size: 1.1rem;">مراقبة مباشره لسعة المحطات، وتدفق العربات، وأداء برنامج الولاء.</p>
+            </div>
+            
+            <div class="panel-card mt-15" style="border-top: 4px solid #F9DD9C;">
+                <h2><i class="fas fa-file-pdf"></i> إصدار تقارير النظام (السجل التاريخي)</h2>
+                <p style="color:#666; margin-bottom: 15px;">حدد الفترة الزمنية لطباعة سجل العمليات وحركة العربات كتقرير رسمي.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 15px; align-items: center;">
+                    <div>
+                        <label style="font-weight: bold; color: var(--brunswick-green); font-size: 0.9rem;">من تاريخ:</label>
+                        <input type="date" id="reportFromDate" class="input-style" style="margin: 5px 0 0 0;">
+                    </div>
+                    <div>
+                        <label style="font-weight: bold; color: var(--brunswick-green); font-size: 0.9rem;">إلى تاريخ:</label>
+                        <input type="date" id="reportToDate" class="input-style" style="margin: 5px 0 0 0;">
+                    </div>
+                    <button class="btn-primary" id="btnPrintReport" style="background: #333; margin-top: 25px; padding: 15px 30px; height: 52px;"><i class="fas fa-print"></i> طباعة الملف</button>
+                </div>
+            </div>
+
+            <div class="top-stats">
+                <div class="stat-card" style="border-right: 5px solid var(--vivid-red); justify-content: space-between;">
+                    <div class="stat-info"><h3>محطات تتطلب تدخل</h3><p class="value" id="stationsAlert">0</p></div>
+                    <div style="background: rgba(233,12,0,0.1); padding: 15px; border-radius: 10px;"><i class="fas fa-exclamation-triangle text-red" style="font-size: 2rem;"></i></div>
+                </div>
+                <div class="stat-card" style="border-right: 5px solid var(--brunswick-green); justify-content: space-between;">
+                    <div class="stat-info"><h3>كوبونات مُستبدلة</h3><p class="value">12</p></div>
+                    <div style="background: #eee; padding: 15px; border-radius: 10px;"><i class="fas fa-ticket-alt text-dark" style="font-size: 2rem;"></i></div>
+                </div>
+                <div class="stat-card" style="border-right: 5px solid #F9DD9C; justify-content: space-between;">
+                    <div class="stat-info"><h3>نقاط وُزعت اليوم</h3><p class="value">4,200</p></div>
+                    <div style="background: rgba(249,221,156,0.3); padding: 15px; border-radius: 10px;"><i class="fas fa-gift text-dark" style="font-size: 2rem;"></i></div>
+                </div>
+                <div class="stat-card" style="border-right: 5px solid var(--forest-green); justify-content: space-between;">
+                    <div class="stat-info"><h3>تم استرجاعها اليوم</h3><p class="value">84</p></div>
+                    <div style="background: rgba(65,139,36,0.1); padding: 15px; border-radius: 10px;"><i class="fas fa-check-circle text-green" style="font-size: 2rem;"></i></div>
+                </div>
+            </div>
+
+            <div class="middle-grid">
+                <div class="panel-card">
+                    <h2 style="color: var(--brunswick-green); text-align: center; border-bottom: 2px dashed #eee; padding-bottom: 15px;"><i class="fas fa-list-ul"></i> سجل العمليات المباشر (Live Feed)</h2>
+                    <div id="activityLog" style="margin-top: 15px;">
+                        <div class="log-item" style="border-right: 4px solid var(--forest-green); background: #fafafa; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                            <span>تم استرجاع عربة في المحطة الشمالية - مُنح العميل 50 نقطة </span>
+                            <span style="color: #999;">الآن</span>
+                        </div>
+                        <div class="log-item" style="border-right: 4px solid var(--vivid-red); background: #fafafa; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between;">
+                            <span>العميل (055****123) استبدل 100 نقطة بكوبون خصم 10% 🎟️</span>
+                            <span style="color: #999;">10:42 ص</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-card">
+                    <h2 style="color: var(--brunswick-green); text-align: center; border-bottom: 2px dashed #eee; padding-bottom: 15px;"><i class="fas fa-charging-station text-green"></i> حالة نقاط التجمع <br><span style="font-size: 1rem; color: #666;">(Docking Stations)</span></h2>
+                    
+                    <div class="station-card normal" id="northCard" style="margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h3 style="margin: 0; color: #333; font-size: 1rem;"><i class="fas fa-map-marker-alt"></i> المحطة الشمالية (بوابة 1)</h3>
+                            <span id="northStationCount" style="font-weight: bold; font-size: 1.2rem;">0 من 4</span>
+                        </div>
+                        <div style="background: #eee; border-radius: 10px; height: 15px; overflow: hidden;">
+                            <div id="northStationBar" style="width: 0%; height: 100%; background: var(--forest-green); transition: 0.4s;"></div>
+                        </div>
+                        <p id="northAlertMsg" style="font-weight: bold; margin-top: 15px; font-size: 0.95rem; color: var(--forest-green); text-align: center;">
+                            <i class="fas fa-check-circle"></i> مساحة متوفرة لاستقبال العربات
+                        </p>
+                    </div>
+
+                    <div class="station-card normal" id="southCard" style="margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h3 style="margin: 0; color: #333; font-size: 1rem;"><i class="fas fa-map-marker-alt"></i> المحطة الجنوبية (بوابة 3)</h3>
+                            <span id="southStationCount" style="font-weight: bold; font-size: 1.2rem;">0 من 4</span>
+                        </div>
+                        <div style="background: #eee; border-radius: 10px; height: 15px; overflow: hidden;">
+                            <div id="southStationBar" style="width: 0%; height: 100%; background: var(--forest-green); transition: 0.4s;"></div>
+                        </div>
+                        <p id="southAlertMsg" style="font-weight: bold; margin-top: 15px; font-size: 0.95rem; color: var(--forest-green); text-align: center;">
+                            <i class="fas fa-check-circle"></i> مساحة متوفرة لاستقبال العربات
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid mt-15">
+                <div class="panel-card">
+                    <h2><i class="fas fa-chart-line"></i> معدل إرجاع العربات (اليومي)</h2>
+                    <canvas id="dailyChart" style="max-height: 250px;"></canvas>
+                </div>
+                <div class="panel-card">
+                    <h2><i class="fas fa-chart-pie"></i> حالة الأسطول</h2>
+                    <canvas id="statusChart" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+
+            <div class="panel-card mt-15 admin-only" style="border-top: 4px solid var(--brunswick-green);">
+                <h2><i class="fas fa-user-plus"></i> إدارة الصلاحيات (إضافة موظف)</h2>
+                <form id="adminRegisterForm" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <input type="text" id="newEmpName" placeholder="اسم الموظف" class="input-style" style="margin:0;" required>
+                    <input type="email" id="newEmpEmail" placeholder="البريد الإلكتروني" class="input-style" style="margin:0;" required>
+                    <input type="password" id="newEmpPass" placeholder="كلمة المرور المؤقتة" class="input-style" style="margin:0;" required>
+                    <select id="newEmpRole" class="input-style" style="margin:0; font-family: 'Cairo';">
+                        <option value="Worker">عامل ميداني (شاشة الخريطة فقط)</option>
+                        <option value="Admin">مدير نظام (صلاحيات كاملة)</option>
+                    </select>
+                    <button type="submit" class="btn-primary" id="btnAddNew" style="grid-column: span 2; background: var(--brunswick-green);">اعتماد وإنشاء الحساب</button>
+                </form>
+                <p id="addEmpMsg" style="margin-top: 10px; font-weight: bold; text-align:center;"></p>
+            </div>
+
+        </main>
+    </div>
+    <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>حسابي | مدى</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* تحديث لون الخلفية لهوية مدى */
+        body { background: var(#c1d6ab, #c1d6ab); font-family: 'Cairo'; padding: 50px 20px; }
+        
+        /* توحيد لون الإطار العلوي للون الفستقي */
+        .profile-box { max-width: 450px; margin: auto; background: white; padding: 40px; border-radius: 20px; text-align: center; border-top: 5px solid var(--forest-green); box-shadow: 0 10px 30px rgba(0,0,0,0.08);}
+        .input-style { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #ddd; font-size: 1.1rem; box-sizing: border-box; text-align: center; }
+        .otp-section { display: none; margin-top: 20px; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <!-- قسم تسجيل الدخول برقم الجوال -->
+    <div class="profile-box" id="loginSection">
+        <!-- إضافة شعار مدى -->
+        <img src="images/Mada_logo.png" alt="شعار مدى" style="max-height: 80px; margin-bottom: 15px; filter: drop-shadow(0 4px 6px rgba(163, 192, 143, 0.2));">
+        
+        <h2 style="color: var(--brunswick-green); margin-top: 0;">الحساب الشخصي</h2>
+        <p style="color: #666; margin-bottom: 30px;">يرجى إدخال رقم الجوال.</p>
+        
+        <input type="text" id="phoneInput" placeholder="رقم الجوال (مثال: 055...)" class="input-style">
+        <button id="btnRequestOTP" class="btn-primary" style="width:100%; background: var(--brunswick-green); border: none; border-radius: 12px; color: white; padding: 15px; font-size: 1.1rem; cursor: pointer;">إرسال رمز التحقق (OTP) <i class="fas fa-paper-plane"></i></button>
+        <p id="msgPhone" style="margin-top: 15px; font-weight: bold; color: var(--vivid-red);"></p>
+
+        <div class="otp-section" id="otpContainer">
+            <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="color: var(--forest-green); font-weight: bold;">تم إرسال الرمز لجوالك 📲</p>
+            <input type="text" id="otpInput" placeholder="أدخل الـ OTP المكون من 4 أرقام" class="input-style" style="letter-spacing: 10px; font-weight: bold;" maxlength="4">
+            <button id="btnVerifyOTP" class="btn-primary" style="width:100%; background: var(--forest-green); border: none; border-radius: 12px; color: white; padding: 15px; font-size: 1.1rem; cursor: pointer;">تأكيد الدخول <i class="fas fa-check-circle"></i></button>
+            <p id="msgOTP" style="margin-top: 15px; font-weight: bold; color: var(--vivid-red);"></p>
+        </div>
+    </div>
+
+    <!-- قسم عرض البيانات والنقاط بعد الدخول -->
+    <div class="profile-box" id="dataSection" style="display: none;">
+        <!-- شعار مدى هنا أيضاً ليبقى حاضراً بعد تسجيل الدخول -->
+        <img src="images/Mada_logo.png" alt="شعار مدى" style="max-height: 80px; margin-bottom: 15px; filter: drop-shadow(0 4px 6px rgba(163, 192, 143, 0.2));">
+        
+        <h2 style="color: var(--brunswick-green); margin-top: 0;">أهلاً بك في حسابك! 🌟</h2>
+        <div style="background: rgba(163, 192, 143, 0.1); padding: 30px; border-radius: 15px; margin-top:20px; border: 2px dashed var(--forest-green);">
+            <p style="font-size: 1.2rem; margin:0; font-weight: bold; color: var(--brunswick-green);">رصيدك الحالي من النقاط</p>
+            <h1 id="userPoints" style="font-size: 4.5rem; color: var(--forest-green); margin: 10px 0;">0</h1>
+            <p style="color: #666;">يمكنك استبدالها بخصومات من شركائنا!</p>
+        </div>
+        <button onclick="location.reload()" class="btn-primary" style="width:100%; background: transparent; border: 2px solid var(--vivid-red); color: var(--vivid-red); margin-top: 30px; padding: 15px; border-radius: 12px; font-size: 1.1rem; cursor: pointer; font-weight: bold;"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+    </div>
+    
+    <script type="module" src="js/profile.js"></script>
+</body>
+</html>

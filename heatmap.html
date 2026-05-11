@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدى | العمليات الميدانية</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+    <style>
+        /* تنسيقات كارت المهام المطور للعامل */
+        .task-banner { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px; 
+            transition: all 0.4s ease; 
+            border-top: 6px solid var(--forest-green); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        }
+        
+        .task-banner.alert-mode {
+            border-top: 6px solid var(--vivid-red);
+            background: #FFF9F9;
+        }
+
+        .task-info-group { display: flex; gap: 20px; align-items: center; }
+        
+        .task-icon { 
+            width: 65px; height: 65px; 
+            border-radius: 50%; 
+            display: flex; justify-content: center; align-items: center; 
+            font-size: 2.2rem; 
+            background: rgba(65, 139, 36, 0.1); color: var(--forest-green);
+        }
+        
+        .alert-mode .task-icon { background: rgba(217, 83, 79, 0.1); color: var(--vivid-red); }
+
+        /* عداد العربات الاحترافي */
+        .cart-counter {
+            text-align: center;
+            border-right: 2px dashed #ddd;
+            padding-right: 30px;
+            margin-right: auto;
+            display: none; /* مخفي في حالة الاستقرار */
+        }
+
+        .task-btn { 
+            color: white; padding: 15px 30px; border-radius: 12px; font-size: 1.1rem; 
+            font-weight: bold; border: none; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; 
+            display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .task-btn:hover { transform: translateY(-2px); }
+
+        /* تأثير نبض للأيقونة وقت الطوارئ */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="employee-layout">
+        <aside class="sidebar">
+            <div class="logo" style="display: flex; align-items: center; justify-content: center; background-color:white; padding: 40px 20px 20px 20px; margin: -40px -20px 30px -20px; border-bottom: 4px solid var(--forest-green); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                 <img src="images/Mada_logo.png" alt="شعار مدى" style="max-height: 95px; width: 85%; object-fit: contain;">
+            </div>
+            <!-- 🚨 تعديل السايد بار: روابط الموظف فقط -->
+            <ul class="sidebar-nav">
+                <li><a href="heatmap.html" class="active"><i class="fas fa-map-marked-alt"></i> العمليات والخريطة</a></li>
+                <li><a href="index.html" class="sidebar-logout"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="main-header">
+                <div>
+                    <h1 style="color: var(--brunswick-green);">المهام الميدانية 🛒</h1>
+                    <p>أهلاً بك! هنا مهامك الحالية وخريطة تواجد العربات لتسهيل جمعها.</p>
+                </div>
+            </div>
+
+            <!-- كارت المهام التفاعلي -->
+            <div class="task-banner" id="workerTask">
+                
+                <div class="task-info-group">
+                    <div class="task-icon" id="taskIcon"><i class="fas fa-check-circle"></i></div>
+                    <div>
+                        <h3 id="taskTitle" style="color: var(--brunswick-green); margin: 0; font-size: 1.5rem;">الوضع مستقر</h3>
+                        <p id="taskDesc" style="margin: 8px 0 0 0; color: #666; font-size: 1.1rem;">جميع المحطات بها مساحة كافية، استمر في جولاتك المعتادة.</p>
+                    </div>
+                </div>
+
+                <!-- عداد العربات (يظهر فقط وقت التنبيه) -->
+                <div class="cart-counter" id="taskCounter">
+                    <span style="display: block; font-size: 1rem; color: #888; font-weight: bold;">المطلوب تفريغه</span>
+                    <span id="cartAmount" style="font-size: 3rem; font-weight: 900; color: var(--vivid-red); line-height: 1;">0</span>
+                    <span style="font-size: 1.1rem; color: var(--vivid-red); font-weight: bold;">عربة</span>
+                </div>
+
+                <button class="task-btn" id="taskBtn" style="background: var(--vivid-red); margin-right: 30px;">
+                    <i class="fas fa-truck-loading"></i> استلام وتوجه للموقع
+                </button>
+            </div>
+
+            <div class="panel-card" style="padding: 0; overflow: hidden; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <!-- مساحة الخريطة مجهزة -->
+                <div id="map" style="height: 550px; width: 100%; z-index: 1; background-color: #e5e3df;"></div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- ربط ملف الجافاسكربت الخاص بك -->
+    <script type="module" src="js/heatmap.js"></script>
+
+   
+
+    <!-- كود محاكاة العرض (Demo Script) -->
+    <script>
+        function triggerDemo() {
+            // تحويل الكارت لحالة الخطر
+            const workerTask = document.getElementById('workerTask');
+            workerTask.className = "task-banner alert-mode";
+            
+            document.getElementById('taskIcon').innerHTML = '<i class="fas fa-exclamation-triangle" style="animation: pulse 1s infinite;"></i>';
+            document.getElementById('taskTitle').innerText = 'تكدس حرج في المحطة الشمالية!';
+            document.getElementById('taskTitle').style.color = 'var(--vivid-red)';
+            document.getElementById('taskDesc').innerText = 'المحطة ممتلئة بالكامل (20/20) ولا يوجد مساحة. توجه فوراً لسحب العربات!';
+            
+            document.getElementById('taskCounter').style.display = 'block';
+            document.getElementById('cartAmount').innerText = "20";
+            document.getElementById('taskBtn').style.display = 'block';
+
+            // رسم خريطة الطوارئ بشكل مباشر
+            if (typeof L !== 'undefined') {
+                document.getElementById('map').innerHTML = ''; // تنظيف الخريطة القديمة
+                const tempMap = L.map('map').setView([24.7136, 46.6753], 17);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(tempMap);
+                
+                // إضافة بقعة حرارية حمراء تدل على التكدس
+                if (typeof L.heatLayer !== 'undefined') {
+                    L.heatLayer([
+                        [24.7136, 46.6753, 1], [24.7137, 46.6754, 1], [24.7135, 46.6752, 0.8]
+                    ], { radius: 30, blur: 20, gradient: {0.4: 'yellow', 1.0: 'red'} }).addTo(tempMap);
+                }
+            }
+        }
+    </script>
+    <!-- زر سري للمناقشة -->
+<button id="demoBtn" style="position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: var(--vivid-red); color: white; border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(217, 83, 79, 0.4);">
+    <i class="fas fa-magic"></i> محاكاة تكدس للعرض
+</button>
+</body>
+</html>

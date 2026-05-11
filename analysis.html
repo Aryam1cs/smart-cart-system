@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>SmartCart | تحليلات الذكاء الاصطناعي</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .ai-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .ai-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-top: 5px solid var(--brunswick-green); }
+        .form-row { display: flex; justify-content: space-between; margin-bottom: 15px; align-items: center; }
+        .form-row label { font-weight: bold; color: var(--text-dark); }
+        .form-row input, .form-row select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; width: 55%; font-family: 'Cairo'; }
+        .result-box { margin-top: 20px; padding: 20px; border-radius: 10px; text-align: center; background: #fafafa; border: 2px dashed #ccc; transition: 0.3s; }
+        .result-value { font-size: 3rem; font-weight: bold; margin: 10px 0; color: var(--forest-green); }
+        @media (max-width: 1024px) { .ai-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="employee-layout">
+        <aside class="sidebar">
+            <div class="logo" style="display: flex; align-items: center; justify-content: center; background-color:#FCFAf5; padding: 40px 20px 20px 20px; margin: -40px -20px 30px -20px; border-bottom: 4px solid var(--forest-green); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                 <img src="images/Mada_logo.png" alt="شعار مدى" style="max-height: 95px; width: 85%; object-fit: contain;">
+                </div>
+            <ul class="sidebar-nav">
+                <li><a href="dashboard.html"><i class="fas fa-th-large"></i> لوحة القيادة</a></li>
+                <li><a href="analysis.html" class="active"><i class="fas fa-brain"></i> تحليلات الذكاء الاصطناعي</a></li>
+                <li><a href="heatmap.html"><i class="fas fa-map-marked-alt"></i> العمليات الميدانية</a></li>
+                <li><a href="#" id="btnLogout" class="sidebar-logout"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="main-header">
+                <div>
+                    <h1 style="color: var(--brunswick-green);"> تحليلات الذكاء الاصطناعي (AI)</h1>
+                    <p>نماذج التنبؤ بالازدحام والصيانة الاستباقية.</p>
+                </div>
+            </div>
+
+            <div class="ai-grid">
+                <div class="ai-card" style="border-top-color: var(--forest-green);">
+                    <h2><i class="fas fa-users"></i> التنبؤ بالازدحام والطلب</h2>
+                    <p style="color: #666; margin-bottom: 20px;">تغيير المتغيرات لمحاكاة توقعات النظام لحركة الزوار.</p>
+                    
+                    <div class="form-row"><label>الساعة (0-23):</label><input type="number" id="inp_hr" value="18" min="0" max="23"></div>
+                    <div class="form-row">
+                        <label>اليوم:</label>
+                        <select id="inp_weekday"><option value="5">الجمعة (إجازة)</option><option value="1">الاثنين (عمل)</option></select>
+                    </div>
+                    <div class="form-row">
+                        <label>الطقس:</label>
+                        <select id="inp_weather"><option value="1">صافي وممتاز ☀️</option><option value="2">غائم ☁️</option><option value="3">ممطر / سيء 🌧️</option></select>
+                    </div>
+                    <div class="form-row"><label>درجة الحرارة (C):</label><input type="number" id="inp_temp" value="28"></div>
+                    
+                    <div class="form-row"><label>الرطوبة (% hum):</label><input type="number" id="inp_hum" value="45" min="0" max="100"></div>
+
+                    <button class="btn-primary" style="width: 100%; margin-top: 15px;" id="btnDemandPredict">توقع عدد الزوار <i class="fas fa-magic"></i></button>
+
+                    <div class="result-box" id="demandResultBox">
+                        <p style="margin: 0;">الطلب المتوقع على العربات:</p>
+                        <div class="result-value" id="demandResult">-</div>
+                    </div>
+                </div>
+
+                <div class="ai-card" style="border-top-color: var(--vivid-red);">
+                    <h2><i class="fas fa-tools"></i> التنبؤ بصحة العربة (الصيانة)</h2>
+                    <p style="color: #666; margin-bottom: 20px;">محاكاة سحب قراءات الحساسات (Volt, Temp...) لفحص العربة.</p>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                        <button class="btn-primary" style="flex: 1; background: var(--forest-green);" id="btnSimGood">محاكاة قراءات سليمة</button>
+                        <button class="btn-primary" style="flex: 1; background: var(--vivid-red);" id="btnSimBad">محاكاة اهتزاز/حرارة</button>
+                    </div>
+
+                    <div style="background: #222; color: #0f0; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.9rem; margin-bottom: 15px; height: 120px; overflow: hidden;" id="sensorDataMonitor">
+                        Waiting for ESP32 streams...
+                    </div>
+
+                    <button class="btn-primary" style="width: 100%; background: #333;" id="btnMaintenancePredict">فحص بالذكاء الاصطناعي <i class="fas fa-search"></i></button>
+
+                    <div class="result-box" id="maintResultBox">
+                        <p style="margin: 0;">حالة العربة المتوقعة:</p>
+                        <div class="result-value" id="maintResult" style="font-size: 2rem;">-</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script type="module" src="js/analysis.js"></script>
+</body>
+</html>

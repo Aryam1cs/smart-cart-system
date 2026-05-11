@@ -2,95 +2,73 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحقق - إعادة العربة الذكية</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
+    <title>مدى | بوابة الدخول الموحدة</title>
+    <!-- تأكدي من تحديث ملف style.css بالألوان الجديدة كما اتفقنا سابقاً -->
+   <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f4f7f6; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 80%; max-width: 400px; margin: auto; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { width: 90%; padding: 12px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
-        button:hover { background-color: #45a049; }
-        
-        .cart-info { background-color: #e3f2fd; padding: 10px; border-radius: 5px; margin-bottom: 15px; color: #1565c0; font-weight: bold; }
-        
-        /* تصميم مربع كود الخصم */
-        .coupon-box {
-            display: none;
-            margin-top: 20px;
-            padding: 15px;
-            border: 2px dashed #4CAF50;
-            background-color: #e8f5e9;
-            border-radius: 8px;
-            animation: fadeIn 1s;
+        /* تأكدي من وجود هذه المتغيرات في ملف style.css أو ابقيها هنا لغرض شاشة الدخول */
+        :root {
+            --brunswick-green: #7A9B65; /* الأخضر الداكن للنصوص */
+            --forest-green: #A3C08F; /* اللون الفستقي للوجو والعناصر */
+            --peach-soft: #F4F9F1; /* خلفية ناعمة جداً تتناسق مع اللوجو */
+            --vivid-red: #D9534F;
+            --bg-main: #FFFFFF;
         }
-        .coupon-box p { margin: 0; font-size: 14px; color: #333; }
-        .coupon-box h3 { margin: 5px 0; color: #4CAF50; letter-spacing: 2px; font-size: 24px; }
+
+        body { margin: 0; background: var(--bg-main); display: flex; height: 100vh; font-family: 'Cairo'; }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* تحديث قسم الهوية ليصبح أفتح ويبرز اللوجو */
+        .auth-brand { 
+            flex: 1; 
+            background: #1A4734; /* خلفية فاتحة وناعمة بدل التدرج الغامق */
+            color: var(--brunswick-green); /* نصوص غامقة للتباين */
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center;
+            border-left: 1px solid #ddd; /* فاصل نحيف */
+        }
+        
+        .auth-form-section { flex: 1; display: flex; justify-content: center; align-items: center; background: white; }
+        .auth-card { width: 100%; max-width: 400px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border-radius: 15px;}
+        .input-style { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 12px; border: 1px solid #ddd; font-size: 1.1rem; box-sizing: border-box; }
+        
+        /* تأثير جمالي لزر الدخول */
+        .btn-primary {
+            background: #1A4734;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            background: #658155; /* تغميق بسيط للزر عند التمرير */
         }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h2>تأكيد إرجاع العربة 🛒</h2>
-    
-    <div class="cart-info">
-        عربة رقم: <span id="displayCartId">جاري التحقق...</span>
+    <!-- قسم الهوية المحدث باللوجو الجديد -->
+    <div class="auth-brand">
+        <!-- استخدام اللوجو الجديد (Mada_logo.png) بدل الآيكون القديم -->
+        <img src="images/Mada_logo.png" alt="شعار نظام مدى" style="max-height: 140px; margin-bottom: 25px; filter: drop-shadow(0 10px 15px rgba(163, 192, 143, 0.3));">
+        
+        <h1 style="font-size: 3rem; margin:0; color: #becfab;">نظام <span style="color:  #becfab;">مدى</span></h1>
+        <p style="color:#FCFAf5; font-weight: bold; margin-top: 10px; font-size: 1.1rem;">بوابة الدخول الموحدة للموظفين والإدارة</p>
     </div>
 
-    <p>شكراً لتسوقك! أدخل الرمز الموجود في الفاتورة لتحصل على مكافأتك.</p>
-    
-    <form id="verifyForm">
-        <input type="hidden" id="cartId" value=""> 
-        <input type="text" id="otp" placeholder="أدخل رمز OTP من الفاتورة" required>
-        <input type="tel" id="phone" placeholder="أدخل رقم الجوال للتسجيل" required>
-        
-        <button type="submit">تأكيد ومتابعة</button>
-    </form>
-    
-    <p id="responseMessage" style="color: green; display: none; margin-top: 15px; font-weight: bold;"></p>
-    
-    <div id="couponBox" class="coupon-box">
-        <p>مكافأتك جاهزة! استخدم الكود التالي في تسوقك القادم:</p>
-        <h3>SMART2026</h3>
+    <div class="auth-form-section">
+        <div class="auth-card">
+            <h2 style="color:  #1A4734; margin-bottom: 25px; text-align: center;"><i class="fas fa-lock"></i> تسجيل الدخول </h2>
+            <form id="loginForm">
+                <input type="email" id="loginEmail" placeholder="البريد الإلكتروني المؤسسي" class="input-style" required>
+                <input type="password" id="loginPassword" placeholder="كلمة المرور" class="input-style" required>
+                <button type="submit" class="btn-primary" id="btnLogin" style="width:100%; font-size: 1.2rem; padding: 15px; border-radius: 12px;">دخول آمن للنظام</button>
+                <p id="loginError" style="color:var(--vivid-red); margin-top:15px; font-weight:bold; text-align: center;"></p>
+            </form>
+        </div>
     </div>
-</div>
-
-<script>
-    // --- الجزء الجديد: قراءة رقم العربة من الرابط (الباركود) ---
-    const urlParams = new URLSearchParams(window.location.search);
-    // لو الرابط فيه cart_id بياخذه، ولو مافيه بيكتب "غير معروف"
-    const cartIdFromURL = urlParams.get('cart_id') || 'غير معروف'; 
-    
-    // نحدث الواجهة بالرقم الجديد
-    document.getElementById('displayCartId').innerText = cartIdFromURL;
-    document.getElementById('cartId').value = cartIdFromURL;
-    // --------------------------------------------------------
-
-    document.getElementById('verifyForm').addEventListener('submit', function(e) {
-        e.preventDefault(); 
-        
-        document.getElementById('verifyForm').style.display = 'none';
-        
-        const msg = document.getElementById('responseMessage');
-        msg.style.display = 'block';
-        msg.innerText = "تم استلام طلبك للعربة رقم (" + cartIdFromURL + ")! سيتم إضافة النقاط فور وصولها.";
-        
-        document.getElementById('couponBox').style.display = 'block';
-        
-        confetti({
-            particleCount: 150,
-            spread: 80,
-            origin: { y: 0.6 },
-            colors: ['#4CAF50', '#FFC107', '#2196F3', '#FF5722']
-        });
-    });
-</script>
-
+    <script type="module" src="js/auth.js"></script>
 </body>
 </html>
